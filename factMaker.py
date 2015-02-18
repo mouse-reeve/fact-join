@@ -29,9 +29,10 @@ def get_page(page=None):
         sentences += paragraph.split('. ')
 
         for sentence in sentences:
-            sentence = sentence.strip()
-            if sentence == '':
+            if sentence == '' or re.match(r'^\s$', sentence):
                 sentences.remove(sentence)
+
+            sentence = sentence.strip()
 
     return {'topic': topic, 'text': sentences}
 
@@ -44,7 +45,7 @@ content = [get_page(primary_page), get_page(secondary_page)]
 print content[0]['topic'] + ' + ' + content[1]['topic']
 
 # add the first sentence of the primary article untouched.
-fact = []#[content[0]['text'][0]]
+fact = []
 
 for i in range(10):
     if len(content[0]['text']) > i and len(content[1]['text']) > i:
