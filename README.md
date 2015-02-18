@@ -1,5 +1,5 @@
 # fact-join
 
-Takes two random wikipedia pages and merges them into one tidbit of new information.
+A simple script that takes two Wikipedia pages from user input or at random, and then merges them to create new facts.
 
-`Cross-reactivity applies to the reaction between two different species as opposed to the self-reactivity. In chemistry it is composed of two villages, Bozieni and Fântânele. At the same time each of these molecules included Ghinoaica, Ungureni and Vadu Săpat villages until 2004, when they were split off to form Vadu Săpat commune.`
+`Despite its minor importance in Plato's work, the Atlantis story is the most densely settled large city (population greater than 200,000) in the state of California and the second-most densely populated major city in the United States after New York City.`
