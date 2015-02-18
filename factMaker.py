@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 import requests
 import re
+import nltk
+from nltk import word_tokenize
 
 
 def get_page():
@@ -17,7 +19,7 @@ def get_page():
     for paragraph in paragraphs:
         paragraph = paragraph.text
         paragraph = re.sub(r'\[[0-9].?\]', ' ', paragraph)
-        paragraph = re.sub(r'\n', '', paragraph)
+        paragraph = re.sub(r'[\s]+', ' ', paragraph)
         sentences += paragraph.split('. ')
 
     return {'topic': topic, 'text': sentences}
@@ -29,13 +31,32 @@ for i in range(2):
 
 print content[0]['topic'] + ' + ' + content[1]['topic']
 
+# add the first sentence of the primary article untouched.
 fact = [content[0]['text'][0]]
 
-i = 0
 for i in range(1, 10):
     if len(content[0]['text']) > i and len(content[1]['text']) > i:
-        fact.append(content[1]['text'][i])
-        fact.append(content[0]['text'][i])
+        primary = content[0]['text'][i]
+        secondary = content[1]['text'][i]
+        primary_pos = nltk.pos_tag(word_tokenize(primary))
+        secondary_pos = nltk.pos_tag(word_tokenize(secondary))
+
+        sentence = []
+        if len(primary_pos) and len(secondary_pos):
+            for word in primary_pos:
+                if word[1][:2] == 'VB':
+                    break
+                else:
+                    sentence.append(word[0])
+
+            isAddable = False
+            for word in secondary_pos:
+                if word[1][:2] == 'VB':
+                    isAddable = True
+                if isAddable:
+                    sentence.append(word[0])
+            fact.append(' '.join(sentence))
+
     else:
         break
 
