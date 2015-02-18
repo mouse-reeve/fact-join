@@ -1,12 +1,15 @@
 from bs4 import BeautifulSoup
+from nltk import word_tokenize
 import requests
 import re
 import nltk
-from nltk import word_tokenize
 
 
-def get_page():
-    r = requests.get('http://en.wikipedia.org/wiki/Special:Random')
+def get_page(page=None):
+    if page:
+        r = requests.get(page)
+    else:
+        r = requests.get('http://en.wikipedia.org/wiki/Special:Random')
 
     soup = BeautifulSoup(r.text)
 
@@ -14,20 +17,28 @@ def get_page():
     content = soup.find('div', {'id': 'mw-content-text'})
     paragraphs = content.findChildren('p')
 
-    sentences = []
+    match = re.search(r'[can|may] refer to', paragraphs[0].text)
+    if match and not page:
+        return get_page()
 
+    sentences = []
     for paragraph in paragraphs:
         paragraph = paragraph.text
-        paragraph = re.sub(r'\[[0-9].?\]', ' ', paragraph)
+        paragraph = re.sub(r'\[[0-9].?\]', '', paragraph)
         paragraph = re.sub(r'[\s]+', ' ', paragraph)
         sentences += paragraph.split('. ')
+
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if sentence == '':
+                sentences.remove(sentence)
 
     return {'topic': topic, 'text': sentences}
 
 
-content = []
-for i in range(2):
-    content.append(get_page())
+# content = [get_page('http://en.wikipedia.org/wiki/Salt_marsh_harvest_mouse'),
+#           get_page('http://en.wikipedia.org/wiki/Astaroth')]
+content = [get_page(), get_page()]
 
 print content[0]['topic'] + ' + ' + content[1]['topic']
 
@@ -61,5 +72,8 @@ for i in range(1, 10):
         break
 
 result = '. \n'.join(fact) + '.'
+result = re.sub(r' ,', ',', result)
+result = re.sub(r' \'', '\'', result)
 
 print result
+print '\n\n'
