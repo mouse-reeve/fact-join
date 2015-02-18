@@ -36,16 +36,17 @@ def get_page(page=None):
     return {'topic': topic, 'text': sentences}
 
 
-# content = [get_page('http://en.wikipedia.org/wiki/Salt_marsh_harvest_mouse'),
-#           get_page('http://en.wikipedia.org/wiki/Astaroth')]
-content = [get_page(), get_page()]
+primary_page = raw_input("name a wikipedia page: ")
+secondary_page = raw_input("and another: ")
+
+content = [get_page(primary_page), get_page(secondary_page)]
 
 print content[0]['topic'] + ' + ' + content[1]['topic']
 
 # add the first sentence of the primary article untouched.
-fact = [content[0]['text'][0]]
+fact = []#[content[0]['text'][0]]
 
-for i in range(1, 10):
+for i in range(10):
     if len(content[0]['text']) > i and len(content[1]['text']) > i:
         primary = content[0]['text'][i]
         secondary = content[1]['text'][i]
