@@ -26,6 +26,7 @@ def get_page(page=None):
         paragraph = paragraph.text
         paragraph = re.sub(r'\[[0-9].?\]', '', paragraph)
         paragraph = re.sub(r'[\s]+', ' ', paragraph)
+        paragraph = re.sub(r' \(.*\)', '', paragraph)
         sentences += paragraph.split('. ')
 
         for sentence in sentences:
