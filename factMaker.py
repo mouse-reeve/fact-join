@@ -4,6 +4,7 @@ from nltk import word_tokenize
 import requests
 import re
 import nltk
+import sys
 
 
 def get_page(page=None):
@@ -39,46 +40,48 @@ def get_page(page=None):
 
     return {'topic': topic, 'text': sentences}
 
+if __name__ == '__main__':
+    primary_page = sys.argv[1] if len(sys.argv) >= 2 else \
+                   'http://en.wikipedia.org/wiki/Special:Random'
+    secondary_page = sys.argv[2] if len(sys.argv) >= 3 else \
+                     'http://en.wikipedia.org/wiki/Special:Random'
 
-primary_page = raw_input("name a wikipedia page: ")
-secondary_page = raw_input("and another: ")
+    content = [get_page(primary_page), get_page(secondary_page)]
 
-content = [get_page(primary_page), get_page(secondary_page)]
+    print '%s + %s' % (content[0]['topic'], content[1]['topic'])
 
-print content[0]['topic'] + ' + ' + content[1]['topic']
+    # add the first sentence of the primary article untouched.
+    fact = []
 
-# add the first sentence of the primary article untouched.
-fact = []
+    for i in range(10):
+        if len(content[0]['text']) > i and len(content[1]['text']) > i:
+            primary = content[0]['text'][i]
+            secondary = content[1]['text'][i]
+            primary_pos = nltk.pos_tag(word_tokenize(primary))
+            secondary_pos = nltk.pos_tag(word_tokenize(secondary))
 
-for i in range(10):
-    if len(content[0]['text']) > i and len(content[1]['text']) > i:
-        primary = content[0]['text'][i]
-        secondary = content[1]['text'][i]
-        primary_pos = nltk.pos_tag(word_tokenize(primary))
-        secondary_pos = nltk.pos_tag(word_tokenize(secondary))
+            joined_sentence = []
+            if len(primary_pos) and len(secondary_pos):
+                for word in primary_pos:
+                    if word[1][:2] == 'VB':
+                        break
+                    else:
+                        joined_sentence.append(word[0])
 
-        joined_sentence = []
-        if len(primary_pos) and len(secondary_pos):
-            for word in primary_pos:
-                if word[1][:2] == 'VB':
-                    break
-                else:
-                    joined_sentence.append(word[0])
+                isAddable = False
+                for word in secondary_pos:
+                    if word[1][:2] == 'VB':
+                        isAddable = True
+                    if isAddable:
+                        joined_sentence.append(word[0])
+                fact.append(' '.join(joined_sentence))
 
-            isAddable = False
-            for word in secondary_pos:
-                if word[1][:2] == 'VB':
-                    isAddable = True
-                if isAddable:
-                    joined_sentence.append(word[0])
-            fact.append(' '.join(joined_sentence))
+        else:
+            break
 
-    else:
-        break
+    result = '. \n'.join(fact) + '.'
+    result = re.sub(r' ,', ',', result)
+    result = re.sub(r' \'', '\'', result)
 
-result = '. \n'.join(fact) + '.'
-result = re.sub(r' ,', ',', result)
-result = re.sub(r' \'', '\'', result)
-
-print result
-print '\n\n'
+    print result
+    print '\n\n'
