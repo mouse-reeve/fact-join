@@ -7,3 +7,7 @@
 bin/
 include/
 lib/
+
+facts.json
+settings.py
+pip-selfcheck.json
