@@ -1,9 +1,9 @@
 ''' Combines sentences from wikipedia articles '''
 from bs4 import BeautifulSoup
-from nltk import word_tokenize
-import requests
-import re
 import nltk
+from nltk import word_tokenize
+import re
+import requests
 import sys
 
 
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     print '%s + %s' % (content[0]['topic'], content[1]['topic'])
 
     # add the first sentence of the primary article untouched.
-    fact = []
+    facts = []
 
     for i in range(10):
         if len(content[0]['text']) > i and len(content[1]['text']) > i:
@@ -74,14 +74,14 @@ if __name__ == '__main__':
                         isAddable = True
                     if isAddable:
                         joined_sentence.append(word[0])
-                fact.append(' '.join(joined_sentence))
+                facts.append(' '.join(joined_sentence))
 
         else:
             break
 
-    result = '. \n'.join(fact) + '.'
-    result = re.sub(r' ,', ',', result)
-    result = re.sub(r' \'', '\'', result)
+    for fact in facts:
+        fact = re.sub(r' \.', '.', fact)
+        fact = re.sub(r' ,', ',', fact)
+        fact = re.sub(r' \'', '\'', fact)
+        print fact
 
-    print result
-    print '\n\n'
