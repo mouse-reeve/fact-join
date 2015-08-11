@@ -1,3 +1,4 @@
+''' Combines sentences from wikipedia articles '''
 from bs4 import BeautifulSoup
 from nltk import word_tokenize
 import requests
@@ -6,6 +7,7 @@ import nltk
 
 
 def get_page(page=None):
+    ''' load and parse a wikipedia page '''
     if page:
         r = requests.get(page)
     else:
@@ -14,8 +16,8 @@ def get_page(page=None):
     soup = BeautifulSoup(r.text)
 
     topic = soup.find('h1').text
-    content = soup.find('div', {'id': 'mw-content-text'})
-    paragraphs = content.findChildren('p')
+    page_content = soup.find('div', {'id': 'mw-content-text'})
+    paragraphs = page_content.findChildren('p')
 
     match = re.search(r'[can|may] refer to', paragraphs[0].text)
     if match and not page:
@@ -55,21 +57,21 @@ for i in range(10):
         primary_pos = nltk.pos_tag(word_tokenize(primary))
         secondary_pos = nltk.pos_tag(word_tokenize(secondary))
 
-        sentence = []
+        joined_sentence = []
         if len(primary_pos) and len(secondary_pos):
             for word in primary_pos:
                 if word[1][:2] == 'VB':
                     break
                 else:
-                    sentence.append(word[0])
+                    joined_sentence.append(word[0])
 
             isAddable = False
             for word in secondary_pos:
                 if word[1][:2] == 'VB':
                     isAddable = True
                 if isAddable:
-                    sentence.append(word[0])
-            fact.append(' '.join(sentence))
+                    joined_sentence.append(word[0])
+            fact.append(' '.join(joined_sentence))
 
     else:
         break
