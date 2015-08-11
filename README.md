@@ -1,5 +1,7 @@
 # fact-join
 
+Update: now running as a [twitter bot](https://twitter.com/brand_new_facts)
+
 A simple script that takes two Wikipedia pages from user input or at random, and then merges them to create new facts.
 
 Atlantis + San Francisco
