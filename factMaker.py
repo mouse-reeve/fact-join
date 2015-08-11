@@ -41,9 +41,9 @@ def get_page(page=None):
     return {'topic': topic, 'text': sentences}
 
 if __name__ == '__main__':
-    primary_page = sys.argv[1] if len(sys.argv) >= 2 else \
+    primary_page = 'http://en.wikipedia.org/wiki/%s' % sys.argv[1] if len(sys.argv) >= 2 else \
                    'http://en.wikipedia.org/wiki/Special:Random'
-    secondary_page = sys.argv[2] if len(sys.argv) >= 3 else \
+    secondary_page = 'http://en.wikipedia.org/wiki/%s' % sys.argv[2] if len(sys.argv) >= 3 else \
                      'http://en.wikipedia.org/wiki/Special:Random'
 
     content = [get_page(primary_page), get_page(secondary_page)]
