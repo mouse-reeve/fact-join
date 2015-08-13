@@ -83,5 +83,8 @@ if __name__ == '__main__':
         fact = re.sub(r' \.', '.', fact)
         fact = re.sub(r' ,', ',', fact)
         fact = re.sub(r' \'', '\'', fact)
-        print '%s #%s' % (fact, ''.join(content[0]['topic'].split(' ')))
+        hashtag = content[0]['topic'].split(' ')
+        hashtag[0] = hashtag[0].lower()
+        hashtag = ''.join(hashtag)
+        print '%s #%s' % (fact, hashtag)
 
