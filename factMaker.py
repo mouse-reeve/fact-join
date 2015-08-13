@@ -83,5 +83,5 @@ if __name__ == '__main__':
         fact = re.sub(r' \.', '.', fact)
         fact = re.sub(r' ,', ',', fact)
         fact = re.sub(r' \'', '\'', fact)
-        print fact
+        print '%s #%s' % (fact, ''.join(content[0]['topic'].split(' ')))
 
