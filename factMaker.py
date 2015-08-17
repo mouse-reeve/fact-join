@@ -9,15 +9,14 @@ import sys
 
 def get_page(page=None):
     ''' load and parse a wikipedia page '''
-    #if page:
-    #    r = requests.get(page)
-    #else:
-    #    r = requests.get('http://en.wikipedia.org/wiki/Special:Random')
+    if page:
+        r = requests.get(page)
+    else:
+        r = requests.get('http://en.wikipedia.org/wiki/Special:Random')
 
-    r = open(page)
-    soup = BeautifulSoup(r.read())#BeautifulSoup(r.text)
+    soup = BeautifulSoup(r.text)
 
-    topic = soup.find('h1').text
+    page_topic = soup.find('h1').text
     page_content = soup.find('div', {'id': 'mw-content-text'})
     paragraphs = page_content.findChildren('p')
 
@@ -43,7 +42,7 @@ def get_page(page=None):
 
             sentence = sentence.strip()
 
-    return {'topic': topic, 'text': sentences}
+    return {'topic': page_topic, 'text': sentences}
 
 
 def pos_tag(sentences):
@@ -77,15 +76,10 @@ def merge_sentences(primary, secondary):
 
 
 if __name__ == '__main__':
-    '''
     primary_page = 'http://en.wikipedia.org/wiki/%s' % sys.argv[1] if len(sys.argv) >= 2 else \
                    'http://en.wikipedia.org/wiki/Special:Random'
     secondary_page = 'http://en.wikipedia.org/wiki/%s' % sys.argv[2] if len(sys.argv) >= 3 else \
                      'http://en.wikipedia.org/wiki/Special:Random'
-    '''
-
-    primary_page = 'Cleveland'
-    secondary_page = 'Lothlorien'
 
     content = [get_page(primary_page), get_page(secondary_page)]
     for item in content:
@@ -102,9 +96,15 @@ if __name__ == '__main__':
         fact = re.sub(r' \.', '.', fact)
         fact = re.sub(r' ,', ',', fact)
         fact = re.sub(r' \'', '\'', fact)
-        hashtag = content[0]['topic'].split(' ')
-        hashtag[0] = hashtag[0].lower()
-        hashtag = ''.join(hashtag)
+        fact = re.sub(r'`` ', '\"', fact)
+        fact = re.sub(r'\'\'', '\"', fact)
+
+        topic = content[0]['topic']
+        hashtag = topic.split(' ')
+        hashtag = '#%s' % ''.join(hashtag)
+
+        if topic in fact:
+            fact = re.sub(topic, hashtag, fact)
+
         print fact
-        #print '%s #%s' % (fact, hashtag)
 
