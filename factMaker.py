@@ -58,6 +58,24 @@ def pos_tag(sentences):
             tagged.append(tags)
     return tagged
 
+def merge_sentences(primary, secondary):
+    ''' combines two pos tagged sentences '''
+    joined_sentence = []
+    for word in primary:
+        if word[1][:2] == 'VB':
+            break
+        else:
+            joined_sentence.append(word[0])
+
+    isAddable = False
+    for word in secondary:
+        if word[1][:2] == 'VB':
+            isAddable = True
+        if isAddable:
+            joined_sentence.append(word[0])
+    return ' '.join(joined_sentence)
+
+
 if __name__ == '__main__':
     '''
     primary_page = 'http://en.wikipedia.org/wiki/%s' % sys.argv[1] if len(sys.argv) >= 2 else \
@@ -73,28 +91,12 @@ if __name__ == '__main__':
     for item in content:
         item['tagged'] = pos_tag(item['text'][:20])
 
-    print '%s + %s' % (content[0]['topic'], content[1]['topic'])
-
     facts = []
-
     while len(content[0]['tagged']) and len(content[1]['tagged']):
-        primary = content[0]['tagged'].pop(0)
-        secondary = content[1]['tagged'].pop(0)
+        facts.append(merge_sentences(content[0]['tagged'].pop(0), content[1]['tagged'].pop(0)))
 
-        joined_sentence = []
-        for word in primary:
-            if word[1][:2] == 'VB':
-                break
-            else:
-                joined_sentence.append(word[0])
-
-        isAddable = False
-        for word in secondary:
-            if word[1][:2] == 'VB':
-                isAddable = True
-            if isAddable:
-                joined_sentence.append(word[0])
-        facts.append(' '.join(joined_sentence))
+    # display the results
+    print '%s + %s' % (content[0]['topic'], content[1]['topic'])
 
     for fact in facts:
         fact = re.sub(r' \.', '.', fact)
