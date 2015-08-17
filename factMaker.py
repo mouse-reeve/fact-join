@@ -9,12 +9,13 @@ import sys
 
 def get_page(page=None):
     ''' load and parse a wikipedia page '''
-    if page:
-        r = requests.get(page)
-    else:
-        r = requests.get('http://en.wikipedia.org/wiki/Special:Random')
+    #if page:
+    #    r = requests.get(page)
+    #else:
+    #    r = requests.get('http://en.wikipedia.org/wiki/Special:Random')
 
-    soup = BeautifulSoup(r.text)
+    r = open(page)
+    soup = BeautifulSoup(r.read())#BeautifulSoup(r.text)
 
     topic = soup.find('h1').text
     page_content = soup.find('div', {'id': 'mw-content-text'})
@@ -27,8 +28,12 @@ def get_page(page=None):
     sentences = []
     for paragraph in paragraphs:
         paragraph = paragraph.text
+        # remove citation footnotes: [1]
         paragraph = re.sub(r'\[[0-9].?\]', '', paragraph)
+
         paragraph = re.sub(r'[\s]+', ' ', paragraph)
+
+        # remove parentheticals: (whateva)
         paragraph = re.sub(r' \(.*\)', '', paragraph)
         sentences += paragraph.split('. ')
 
@@ -40,44 +45,56 @@ def get_page(page=None):
 
     return {'topic': topic, 'text': sentences}
 
+
+def pos_tag(sentences):
+    ''' uses nltk to tag part of speech for each sentence '''
+    tagged = []
+    for sentence in sentences:
+        tags = nltk.pos_tag(word_tokenize(sentence))
+
+        # throw out sentenes with no verb
+        verbs = [word for word in tags if word[1].startswith('VB')]
+        if len(verbs):
+            tagged.append(tags)
+    return tagged
+
 if __name__ == '__main__':
+    '''
     primary_page = 'http://en.wikipedia.org/wiki/%s' % sys.argv[1] if len(sys.argv) >= 2 else \
                    'http://en.wikipedia.org/wiki/Special:Random'
     secondary_page = 'http://en.wikipedia.org/wiki/%s' % sys.argv[2] if len(sys.argv) >= 3 else \
                      'http://en.wikipedia.org/wiki/Special:Random'
+    '''
+
+    primary_page = 'Cleveland'
+    secondary_page = 'Lothlorien'
 
     content = [get_page(primary_page), get_page(secondary_page)]
+    for item in content:
+        item['tagged'] = pos_tag(item['text'][:20])
 
     print '%s + %s' % (content[0]['topic'], content[1]['topic'])
 
-    # add the first sentence of the primary article untouched.
     facts = []
 
-    for i in range(10):
-        if len(content[0]['text']) > i and len(content[1]['text']) > i:
-            primary = content[0]['text'][i]
-            secondary = content[1]['text'][i]
-            primary_pos = nltk.pos_tag(word_tokenize(primary))
-            secondary_pos = nltk.pos_tag(word_tokenize(secondary))
+    while len(content[0]['tagged']) and len(content[1]['tagged']):
+        primary = content[0]['tagged'].pop(0)
+        secondary = content[1]['tagged'].pop(0)
 
-            joined_sentence = []
-            if len(primary_pos) and len(secondary_pos):
-                for word in primary_pos:
-                    if word[1][:2] == 'VB':
-                        break
-                    else:
-                        joined_sentence.append(word[0])
+        joined_sentence = []
+        for word in primary:
+            if word[1][:2] == 'VB':
+                break
+            else:
+                joined_sentence.append(word[0])
 
-                isAddable = False
-                for word in secondary_pos:
-                    if word[1][:2] == 'VB':
-                        isAddable = True
-                    if isAddable:
-                        joined_sentence.append(word[0])
-                facts.append(' '.join(joined_sentence))
-
-        else:
-            break
+        isAddable = False
+        for word in secondary:
+            if word[1][:2] == 'VB':
+                isAddable = True
+            if isAddable:
+                joined_sentence.append(word[0])
+        facts.append(' '.join(joined_sentence))
 
     for fact in facts:
         fact = re.sub(r' \.', '.', fact)
@@ -86,5 +103,6 @@ if __name__ == '__main__':
         hashtag = content[0]['topic'].split(' ')
         hashtag[0] = hashtag[0].lower()
         hashtag = ''.join(hashtag)
-        print '%s #%s' % (fact, hashtag)
+        print fact
+        #print '%s #%s' % (fact, hashtag)
 
