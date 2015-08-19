@@ -22,11 +22,16 @@ if __name__ == '__main__':
     auth.set_access_token(settings.ACCESS_TOKEN, settings.ACCESS_SECRET)
     api = tweepy.API(auth)
 
-    for _ in range(0, 4):
-        content = get_fact()
-        try:
-            api.update_status(status=content)
-            break
-        except TweepError as e:
-            print 'Failed to tweet: "%s"' % content
-            print 'error: %s' % e
+    try:
+        api.verify_credentials()
+    except TweepError:
+        pass
+    else:
+        for _ in range(0, 4):
+            content = get_fact()
+            try:
+                api.update_status(status=content)
+                break
+            except TweepError as e:
+                print 'Failed to tweet: "%s"' % content
+                print 'error: %s' % e
