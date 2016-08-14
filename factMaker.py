@@ -19,11 +19,11 @@ def get_page(page=None):
     page_topic = soup.find('h1').text
     page_content = soup.find('div', {'id': 'mw-content-text'})
     paragraphs = page_content.findChildren('p')
-    
+
     # skip lists
     if (page_topic.startswith('List ') or page_topic.startswith('Lists ')) and not page:
         return get_page()
-    
+
     # skip disambiguation pages
     match = re.search(r'[can|may] refer to', paragraphs[0].text)
     if match and not page:
