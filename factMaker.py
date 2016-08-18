@@ -9,7 +9,7 @@ import sys
 
 def get_page(page=None):
     ''' load and parse a wikipedia page '''
-    if page:
+    if page and page != 'http://en.wikipedia.org/wiki/':
         r = requests.get(page)
     else:
         r = requests.get('http://en.wikipedia.org/wiki/Special:Random')
