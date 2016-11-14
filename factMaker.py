@@ -81,11 +81,10 @@ def merge_sentences(primary, secondary):
 
 
 if __name__ == '__main__':
-    primary_page = 'http://en.wikipedia.org/wiki/'
-    secondary_page = 'http://en.wikipedia.org/wiki/'
+    wiki_url = 'http://en.wikipedia.org/wiki/'
 
-    primary_page += sys.argv[1] if len(sys.argv) >= 2 else 'Special:Random'
-    secondary_page += sys.argv[2] if len(sys.argv) >= 3 else 'Special:Random'
+    primary_page = wiki_url + sys.argv[1] if len(sys.argv) >= 2 else None
+    secondary_page = wiki_url + sys.argv[2] if len(sys.argv) >= 3 else None
 
     content = [get_page(primary_page), get_page(secondary_page)]
     for item in content:
