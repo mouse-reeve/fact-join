@@ -21,7 +21,7 @@ def get_page(page=None):
     paragraphs = page_content.findChildren('p')
 
     # skip lists
-    if (page_topic.startswith('List ') or page_topic.startswith('Lists ')) and not page:
+    if re.match(r'^List[s]? ', page_topic) and not page:
         return get_page()
 
     # skip disambiguation pages
@@ -81,10 +81,11 @@ def merge_sentences(primary, secondary):
 
 
 if __name__ == '__main__':
-    primary_page = 'http://en.wikipedia.org/wiki/%s' % sys.argv[1] if len(sys.argv) >= 2 else \
-                   'http://en.wikipedia.org/wiki/Special:Random'
-    secondary_page = 'http://en.wikipedia.org/wiki/%s' % sys.argv[2] if len(sys.argv) >= 3 else \
-                     'http://en.wikipedia.org/wiki/Special:Random'
+    primary_page = 'http://en.wikipedia.org/wiki/'
+    secondary_page = 'http://en.wikipedia.org/wiki/'
+
+    primary_page += sys.argv[1] if len(sys.argv) >= 2 else 'Special:Random'
+    secondary_page += sys.argv[2] if len(sys.argv) >= 3 else 'Special:Random'
 
     content = [get_page(primary_page), get_page(secondary_page)]
     for item in content:
@@ -92,7 +93,8 @@ if __name__ == '__main__':
 
     facts = []
     while len(content[0]['tagged']) and len(content[1]['tagged']):
-        facts.append(merge_sentences(content[0]['tagged'].pop(0), content[1]['tagged'].pop(0)))
+        facts.append(merge_sentences(content[0]['tagged'].pop(0),
+                                     content[1]['tagged'].pop(0)))
 
     # display the results
     print '%s + %s' % (content[0]['topic'], content[1]['topic'])
