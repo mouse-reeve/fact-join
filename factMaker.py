@@ -1,7 +1,6 @@
 ''' Combines sentences from wikipedia articles '''
 from bs4 import BeautifulSoup
-import nltk
-from nltk import word_tokenize
+from nltk import pos_tag, word_tokenize
 import re
 import requests
 import sys
@@ -50,11 +49,11 @@ def get_page(page=None):
     return {'topic': page_topic, 'text': sentences}
 
 
-def pos_tag(sentences):
+def get_pos_tags(sentences):
     ''' uses nltk to tag part of speech for each sentence '''
     tagged = []
     for sentence in sentences:
-        tags = nltk.pos_tag(word_tokenize(sentence))
+        tags = pos_tag(word_tokenize(sentence))
 
         # throw out sentenes with no verb
         verbs = [word for word in tags if word[1].startswith('VB')]
@@ -88,7 +87,7 @@ if __name__ == '__main__':
 
     content = [get_page(primary_page), get_page(secondary_page)]
     for item in content:
-        item['tagged'] = pos_tag(item['text'][:20])
+        item['tagged'] = get_pos_tags(item['text'][:20])
 
     facts = []
     while len(content[0]['tagged']) and len(content[1]['tagged']):
@@ -104,13 +103,6 @@ if __name__ == '__main__':
         fact = re.sub(r' \'', '\'', fact)
         fact = re.sub(r'`` ', '\"', fact)
         fact = re.sub(r'\'\'', '\"', fact)
-
-        topic = content[0]['topic']
-        hashtag = topic.split(' ')
-        hashtag = '#%s' % ''.join(hashtag)
-
-        if topic in fact:
-            fact = re.sub(topic, hashtag, fact)
 
         print fact
 
