@@ -4,9 +4,7 @@
 .Python
 
 # virtualenv
-bin/
-include/
-lib/
+/venv/
 
 settings.py
 pip-selfcheck.json
